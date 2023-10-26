@@ -37,6 +37,7 @@ public class UserServiceImpl implements UserService {
         return userRepository.findByUsername(username).get();
     }
 
+    //если мы бросаем искл в контроллере, они нам тут не нужны
     @Override
     public User findUserById(Long id) {
         if (userRepository.findById(id).isEmpty()) {
@@ -44,8 +45,6 @@ public class UserServiceImpl implements UserService {
         }
         return userRepository.findById(id).get();
     }
-
-
 
 
     @Override

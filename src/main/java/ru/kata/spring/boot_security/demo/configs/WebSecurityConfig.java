@@ -31,9 +31,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .authorizeRequests()
-                .antMatchers("/index", "/").permitAll() //url-адреса "/" и "/index" разрешены всем юзерам, в т.ч. не аутентифицированным
-                .antMatchers("/admin/**").hasRole("ADMIN")//В "/admin/**" могут заходить только юзеры с ролью "ADMIN"
-                .antMatchers("/user/**").hasAnyRole("USER", "ADMIN")
+                .antMatchers("/index", "/", "/login").permitAll() //url-адреса "/" и "/index" разрешены всем юзерам, в т.ч. не аутентифицированным
+                .antMatchers("/api/admin/**").hasRole("ADMIN")//В "/admin/**" могут заходить только юзеры с ролью "ADMIN"
+                .antMatchers("/api/user/**").hasAnyRole("USER", "ADMIN")
                 .anyRequest().authenticated()//Все остальные url-адреса доступны только аутентифицированным
                 .and()//разделитель
 
@@ -48,23 +48,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         auth.authenticationProvider(authenticationProvider());
     }
 
-    /**
-     * //Преобразователь паролей в хэш. Потому что пароли в БД лежат в преобразованном виде.
-     * //Чтобы сравнить введенный с формы пароль с паролем в БД, нужно преобразовать в такой же вид пароль с формы.
-     **/
 
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    /**
-     * //DaoAuthenticationProvider — это имплементация AuthenticationProvider, который получает информацию
-     * //о пользователе с UserDetailsService.
-     * //В AuthenticationProvider заложена логика сверки credentials, т.е. username и пароля, введенного с формы,
-     * //с username и паролем в БД, т.е. он проверяет, есть ли такой юзер в БД или нет.
-     * // Можно ли его аутентифицировать.
-     **/
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();

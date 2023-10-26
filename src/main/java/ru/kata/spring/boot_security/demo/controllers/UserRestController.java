@@ -1,6 +1,7 @@
 package ru.kata.spring.boot_security.demo.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import ru.kata.spring.boot_security.demo.models.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -10,21 +11,19 @@ import ru.kata.spring.boot_security.demo.services.UserService;
 
 import java.security.Principal;
 
-@Controller
-@RequestMapping("/user")
-public class UserController {
+@RestController
+@RequestMapping("/api/user")
+public class UserRestController {
     private final UserService userService;
 
     @Autowired
-    public UserController(UserService userService) {
+    public UserRestController(UserService userService) {
         this.userService = userService;
     }
 
-    @GetMapping()
-    public String showUserAccount(Model model, Principal principal) {
+    @GetMapping("/showAccount")
+    public ResponseEntity<User> showUserAccount(Principal principal) {
         User user = userService.findByUsername(principal.getName());
-        model.addAttribute("user", user);
-        model.addAttribute("userRoles", user.getAuthorities());
-        return "user-page";
+        return ResponseEntity.ok(user);
     }
 }

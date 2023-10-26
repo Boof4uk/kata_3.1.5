@@ -1,0 +1,8 @@
+    @PatchMapping("/users/{id}") почему у нас везде /users/
+
+    @ExceptionHandler
+    public ResponseEntity<FormForError>  Разобраться для чего форма
+
+    Для чего нам получение ролей в контроллерах
+
+    Про инит разобраться

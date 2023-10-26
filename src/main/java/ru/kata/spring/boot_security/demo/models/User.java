@@ -6,15 +6,21 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
-import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
-import java.util.*;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Size;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * //UserDetails нужен д/того, чтобы преобразовать юзера из БД к определенному стандарту, чтобы его понял Спринг Секьюрити.
  * //Т.е. UserDetails - это такая обертка д/Entity-класса.
  * //UserDetails заведует самым основным: полномочиями - getAuthorities(), паролем - getPassword() и
  * // именем юзера - getUsername()
+ * <p>
+ * Аннотации @NotEmpty, @Size, @Email - это проверка на валидность.
+ * Проверка на то, что объект типа User пришел от клиента корректный
  **/
 @Entity
 @Table(name = "users")
@@ -24,18 +30,24 @@ public class User implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotEmpty(message = "Имя не может быть пустым.")
+    @Size(min = 2, max = 10, message = "Имя должно состоять от 2 до 10 символов.")
     @Column(name = "username")
     private String username;
 
+    @NotEmpty(message = "Фамилия не может быть пустым.")
+    @Size(min = 2, max = 10, message = "Фамилия должно состоять от 2 до 10 символов.")
     @Column(name = "lastname")
     private String lastname;
 
+    @Min(14)
     @Column(name = "age")
     private Byte age;
 
     @Email
     @Column(name = "email")
     private String email;
+
     @Column(name = "password")
     private String password;
 
@@ -45,7 +57,7 @@ public class User implements UserDetails {
             joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),//Это колонка текущей сущности, т.е. User.
             inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
     //Это колонка второй (обратной) сущности, с которой связан User, т.е. Role.
-    private List<Role> roles = new ArrayList<>();
+    private Collection <Role> roles;
 
     public User() {
     }
@@ -63,20 +75,13 @@ public class User implements UserDetails {
         return id;
     }
 
+    @Override
+    public String getUsername() {
+        return username;
+    }
+
     public void setUsername(String username) {
         this.username = username;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public List<Role> getRoles() {
-        return roles;
-    }
-
-    public void setRoles(List<Role> roles) {
-        this.roles = roles;
     }
 
 
@@ -88,6 +93,7 @@ public class User implements UserDetails {
         this.lastname = lastname;
     }
 
+
     public Byte getAge() {
         return age;
     }
@@ -95,6 +101,7 @@ public class User implements UserDetails {
     public void setAge(Byte age) {
         this.age = age;
     }
+
 
     public String getEmail() {
         return email;
@@ -106,18 +113,26 @@ public class User implements UserDetails {
 
 
     @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return getRoles();
-    }
-
-    @Override
     public String getPassword() {
         return password;
     }
 
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+
+    public Collection<Role> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Collection<Role> roles) {
+        this.roles = roles;
+    }
+
     @Override
-    public String getUsername() {
-        return username;
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return getRoles();
     }
 
     @Override
@@ -141,13 +156,16 @@ public class User implements UserDetails {
     }
 
     @Override
-    public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", username='" + username + '\'' +
-                ", password='" + password + '\'' +
-                ", roles=" + roles +
-                '}';
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return username.equals(user.username) && lastname.equals(user.lastname);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(username, lastname);
     }
 }
 
