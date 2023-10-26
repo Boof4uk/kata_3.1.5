@@ -2,12 +2,8 @@ package ru.kata.spring.boot_security.demo.controllers;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import ru.kata.spring.boot_security.demo.exceptionHandlers.NoSuchUserException;
@@ -20,7 +16,6 @@ import ru.kata.spring.boot_security.demo.services.RoleService;
 import ru.kata.spring.boot_security.demo.services.UserService;
 
 import javax.validation.Valid;
-import javax.ws.rs.client.Entity;
 import java.security.Principal;
 import java.util.Collection;
 import java.util.List;
@@ -44,12 +39,13 @@ public class AdminRestController {
     }
 
     @GetMapping("/users")
-    public ResponseEntity<List<User>> showAllUsers(Principal principal) {
+    public ResponseEntity<List<User>> showAllUsers() {
         List<User> usersList = userService.findAll();
+        System.out.println(ResponseEntity.ok(usersList));
         return ResponseEntity.ok(usersList);
     }
 
-    @GetMapping("/user-profile/{id}")
+    @GetMapping("/users/{id}")
     public ResponseEntity<User> getUserById(@PathVariable("id") Long id) {
         return ResponseEntity.ok(userService.findUserById(id));
     }
